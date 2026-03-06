@@ -1,8 +1,9 @@
-import express from "express";
-import { bookSeatController } from "./booking.controller.js";
+const express = require("express");
+const { bookSeatController } = require("./booking.controller");
 
 const router = express.Router();
 
 router.post("/book/:seatId", bookSeatController);
 router.get("/book/:seatId", bookSeatController);
-export default router;
+
+module.exports = router;

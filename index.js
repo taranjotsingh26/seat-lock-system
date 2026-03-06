@@ -1,17 +1,54 @@
 console.log("New deployment running");
+
 const express = require("express");
 const mongoose = require("mongoose");
-require("./db");
-
-const Product = require("./models/product");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.get("/test", (req,res)=>{
+
+app.use(express.json());
+
+/* ---------------- MONGODB CONNECTION ---------------- */
+
+mongoose
+  .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/ecommerce")
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
+
+/* ---------------- SCHEMA ---------------- */
+
+const productSchema = new mongoose.Schema({
+  name: String,
+  category: String,
+  avgRating: Number,
+
+  variants: [
+    {
+      sku: String,
+      color: String,
+      price: Number,
+      stock: Number
+    }
+  ],
+
+  reviews: [
+    {
+      rating: Number,
+      comment: String
+    }
+  ]
+});
+
+const Product = mongoose.model("Product", productSchema);
+
+/* ---------------- TEST ROUTE ---------------- */
+
+app.get("/test", (req, res) => {
   res.send("Render deployment working");
 });
 
-// HOME PAGE (HTML view)
+/* ---------------- HOME PAGE ---------------- */
+
 app.get("/", async (req, res) => {
   try {
     const products = await Product.find();
@@ -49,21 +86,40 @@ app.get("/", async (req, res) => {
     res.send(html);
 
   } catch (err) {
-    res.send(err.message);
+    res.status(500).send(err.message);
   }
 });
 
+/* ---------------- GET PRODUCTS ---------------- */
 
-// API ROUTE (JSON)
 app.get("/api/products", async (req, res) => {
   try {
     const products = await Product.find();
     res.json(products);
   } catch (err) {
-    res.json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
+/* ---------------- CREATE PRODUCT ---------------- */
+
+app.post("/api/products", async (req, res) => {
+  try {
+
+    const product = new Product(req.body);
+    await product.save();
+
+    res.json({
+      message: "Product created successfully",
+      product
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ---------------- SERVER ---------------- */
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

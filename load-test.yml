@@ -6,5 +6,5 @@ config:
 
 scenarios:
   - flow:
-      - post:
-          url: "/api/book/1"
+      - get:
+          url: "/api/products"
