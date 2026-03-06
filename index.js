@@ -1,8 +1,6 @@
 console.log("New deployment running");
 const express = require("express");
 
-const Product = require("./models/product");
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.get("/test", (req,res)=>{
