@@ -1,6 +1,5 @@
 console.log("New deployment running");
 const express = require("express");
-require("./db");
 
 const Product = require("./models/product");
 
