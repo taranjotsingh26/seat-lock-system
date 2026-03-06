@@ -1,9 +1,8 @@
-const express = require("express");
-const { bookSeatController } = require("./booking.controller");
+import express from "express";
+import { bookSeatController } from "./booking.controller.js";
 
 const router = express.Router();
 
 router.post("/book/:seatId", bookSeatController);
 router.get("/book/:seatId", bookSeatController);
-
-module.exports = router;
+export default router;
