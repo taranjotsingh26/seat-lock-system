@@ -1,78 +1,83 @@
-console.log("New deployment running");
+console.log("Seat Lock System Running");
 
 const express = require("express");
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-/* ---------------- IN MEMORY STORAGE ---------------- */
+/* ---------------- SEAT STORAGE ---------------- */
 
-let products = [];
+let seats = {
+  1: "available",
+  2: "available",
+  3: "available",
+  4: "available",
+  5: "available"
+};
 
-/* ---------------- TEST ROUTE ---------------- */
-
-app.get("/test", (req, res) => {
-  res.send("Render deployment working");
-});
-
-/* ---------------- HOME PAGE ---------------- */
+/* ---------------- HOME ---------------- */
 
 app.get("/", (req, res) => {
-
-  let html = `<h1>Ecommerce Catalog</h1>`;
-
-  products.forEach(p => {
-    html += `
-    <div style="border:1px solid #ccc;padding:10px;margin:10px">
-      <h2>${p.name}</h2>
-      <p><b>Category:</b> ${p.category}</p>
-      <p><b>Avg Rating:</b> ${p.avgRating}</p>
-
-      <h3>Variants</h3>
-      <ul>
-    `;
-
-    p.variants.forEach(v => {
-      html += `
-      <li>
-      ${v.color} | SKU: ${v.sku} | Price: $${v.price} | Stock: ${v.stock}
-      </li>
-      `;
-    });
-
-    html += "</ul><h3>Reviews</h3><ul>";
-
-    p.reviews.forEach(r => {
-      html += `<li>${r.rating}⭐ - ${r.comment}</li>`;
-    });
-
-    html += "</ul></div>";
-  });
-
-  res.send(html);
+  res.send("Seat Lock System API Running 🚀");
 });
 
-/* ---------------- GET PRODUCTS ---------------- */
+/* ---------------- VIEW SEATS ---------------- */
 
-app.get("/api/products", (req, res) => {
-  res.json(products);
+app.get("/api/seats", (req, res) => {
+  res.json(seats);
 });
 
-/* ---------------- CREATE PRODUCT ---------------- */
+/* ---------------- LOCK SEAT ---------------- */
 
-app.post("/api/products", (req, res) => {
+app.post("/api/lock/:id", (req, res) => {
+  const seatId = req.params.id;
 
-  const product = req.body;
+  if (!seats[seatId]) {
+    return res.status(404).json({ message: "Seat not found" });
+  }
 
-  products.push(product);
+  if (seats[seatId] !== "available") {
+    return res.json({ message: "Seat already locked or booked" });
+  }
+
+  seats[seatId] = "locked";
 
   res.json({
-    message: "Product added successfully",
-    product
+    message: `Seat ${seatId} locked successfully`
   });
+});
 
+/* ---------------- CONFIRM BOOKING ---------------- */
+
+app.post("/api/book/:id", (req, res) => {
+  const seatId = req.params.id;
+
+  if (seats[seatId] !== "locked") {
+    return res.json({ message: "Seat must be locked before booking" });
+  }
+
+  seats[seatId] = "booked";
+
+  res.json({
+    message: `Seat ${seatId} booked successfully`
+  });
+});
+
+/* ---------------- RELEASE SEAT ---------------- */
+
+app.post("/api/release/:id", (req, res) => {
+  const seatId = req.params.id;
+
+  if (!seats[seatId]) {
+    return res.status(404).json({ message: "Seat not found" });
+  }
+
+  seats[seatId] = "available";
+
+  res.json({
+    message: `Seat ${seatId} released`
+  });
 });
 
 /* ---------------- SERVER ---------------- */
