@@ -118,7 +118,13 @@ app.post("/api/products", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.post("/api/book/:id", (req, res) => {
+  const seatId = req.params.id;
 
+  res.json({
+    message: `Seat ${seatId} booked successfully`
+  });
+});
 /* ---------------- SERVER ---------------- */
 
 app.listen(PORT, () => {
