@@ -1,9 +1,12 @@
 console.log("New deployment running");
 
-const express = require("express");
+import express from "express";
+import bookingRoutes from "./booking.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
 
 // Test route
 app.get("/test", (req, res) => {
@@ -15,13 +18,8 @@ app.get("/", (req, res) => {
   res.send("Seat Lock System API Running 🚀");
 });
 
-// Example API
-app.get("/api/products", (req, res) => {
-  res.json([
-    { name: "Phone", price: 500 },
-    { name: "Laptop", price: 1200 }
-  ]);
-});
+// Connect booking routes
+app.use("/api", bookingRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
